@@ -1,14 +1,26 @@
-import { createApp } from 'https://cdnjs.cloudflare.com/ajax/libs/vue/3.0.9/vue.esm-browser.js';
+
 import productModal from './modal.js';
 const apiUrl = 'https://vue3-course-api.hexschool.io';
 const apiPath = 'jamestsai';
 
-const app = createApp({
+const app = Vue.createApp({
     data() {
         return {
             products: [],
             cartData: {},
             tempProduct: {},
+            form: {
+                user: {
+                    name: '',
+                    email: '',
+                    tel: '',
+                    address: '',
+                },
+                message: '',
+            },
+            loadingItem: '',
+            ad:'',
+
         }
     },
     components: {
@@ -86,20 +98,22 @@ const app = createApp({
                 console.log(error)
             })
         },
-        seeMore(item) {
-            const api = `${apiUrl}/api/${apiPath}/product/${item.id}`
-            axios.get(api).then(res=>{
-                if(res.data.success){
+        seeMore(id) {
+            const api = `${apiUrl}/api/${apiPath}/product/${id}`;
+            this.loadingItem = id;
+            axios.get(api).then(res => {
+                if (res.data.success) {
                     this.tempProduct = res.data.product
+                    this.loadingItem = '';
                     this.$refs.modalA.modal.show();
                 }
-                else{
+                else {
                     alert(res.data.message)
                 }
-            }).catch(error=>{
+            }).catch(error => {
                 console.log(error)
             })
-            
+            this.loading = '';
         },
         updateCart(item) {
             const data = {
@@ -117,6 +131,19 @@ const app = createApp({
             }).catch(error => {
                 console.log(error)
             })
+        },
+        submitOrder() {
+            const api = `${apiUrl}/api/${apiPath}/order`;
+            axios.post(api, { data: this.form }).then(res => {
+                if (res.data.success) {
+                    alert(res.data.message);
+                    this.$refs.form.resetForm();
+                    this.getCartData();
+                }
+                else {
+                    alert(res.data.message)
+                }
+            })
         }
     },
     created() {
@@ -124,7 +151,8 @@ const app = createApp({
         this.getCartData();
     }
 });
-/*  VeeValidateI18n.loadLocaleFromURL('./zh_TW.json');
+
+VeeValidateI18n.loadLocaleFromURL('./zh_TW.json');
 
 // Activate the locale
 VeeValidate.configure({
@@ -136,10 +164,16 @@ Object.keys(VeeValidateRules).forEach(rule => {
     if (rule !== 'default') {
         VeeValidate.defineRule(rule, VeeValidateRules[rule]);
     }
-}); */
+});
 
-/* app.component('VForm', VeeValidate.Form);
+
+
+app.component('VForm', VeeValidate.Form);
 app.component('VField', VeeValidate.Field);
-app.component('ErrorMessage', VeeValidate.ErrorMessage); 
- */
+app.component('ErrorMessage', VeeValidate.ErrorMessage);
+
+
+
 app.mount('#app');
+
+
