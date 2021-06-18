@@ -19,7 +19,7 @@ const app = Vue.createApp({
                 message: '',
             },
             loadingItem: '',
-            ad:'',
+            ad: '',
 
         }
     },
@@ -64,7 +64,6 @@ const app = Vue.createApp({
             axios.get(api).then(res => {
                 if (res.data.success) {
                     this.cartData = res.data.data;
-                    this.getCartData();
                 } else {
                     alert('購物車資料讀取失敗');
                 }
@@ -77,6 +76,7 @@ const app = Vue.createApp({
             axios.delete(api).then(res => {
                 if (res.data.success) {
                     alert(res.data.message)
+                    this.getCartData();
                 } else {
                     alert('刪除失敗')
                 }
